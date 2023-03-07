@@ -1,0 +1,46 @@
+#create tables
+## product table
+CREATE TABLE products(
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(255),
+    product_category VARCHAR(255));
+
+##store table
+CREATE TABLE stores(
+    store_id INT PRIMARY KEY,
+    store_name VARCHAR(255),
+    store_location VARCHAR(255));
+
+##sales table
+CREATE TABLE sales(
+    sale_id INT PRIMARY KEY,
+    product_id INT,
+    customer_id INT,
+    store_id INT,
+    sale_date DATE,
+    sale_amount DEC(10,2),
+    FOREIGN KEY (product_id) REFERENCES products(product_id),
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
+    FOREIGN KEY (store_id) REFERENCES stores(store_id));
+
+
+
+#answer questions
+##what are the total sales for each product category?
+SELECT product_category, SUM(sale_amount) AS total_sales
+FROM sales
+INNER JOIN product ON sales.product_id = product.product_id
+GROUP BY product.product_category;
+
+##which store location had the highest total sales for the month of January?
+SELECT MONTH(sale_date) AS sale_month, SUM(sale_amount)
+FROM sales
+WHERE MONTH(sale_date) = 1
+GROUP BY sale_month
+ORDER BY sale_month;
+
+##how many customers made a purchase over $1000 in the last quarter?
+SELECT SUM(sale_amount) AS total_purchase, customer_id, sale_date
+FROM sales
+WHERE sale_date >= '01/10/2022' AND sale_date <= '31/12/2022' AND SUM(sale_amount) >1000
+GROUP BY customer_id;
